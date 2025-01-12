@@ -105,27 +105,19 @@ class Predictor(BasePredictor):
                 check=True
             )
             
-            # Create zip file of the output directory
+            # Create zip file directly in the final location
             zip_filename = "whisply_output.zip"
-            output_dir_path = PathLib(output_dir)
-            zip_base = output_dir_path / "whisply_output"
+            final_dir = PathLib(os.getcwd())
+            final_path = final_dir / zip_filename
             
-            # Create zip in the output directory
+            # Create zip archive directly in the final location
             shutil.make_archive(
-                str(zip_base),
+                str(final_path.with_suffix('')),  # Remove .zip as make_archive adds it
                 'zip',
                 str(output_dir)
             )
             
-            # Copy to final location
-            final_dir = PathLib(os.getcwd())
-            final_path = final_dir / zip_filename
-            shutil.copy2(
-                str(zip_base) + ".zip",
-                str(final_path)
-            )
-            
-            return Path(str(final_path))
+            return Path(final_path)
             
         except subprocess.CalledProcessError as e:
             raise RuntimeError(f"Whisply failed: {e.stderr}")
