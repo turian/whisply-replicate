@@ -1,19 +1,42 @@
 import os
 import subprocess
 from cog import BasePredictor, Input, Path
+from typing import List
 
 class Predictor(BasePredictor):
     def setup(self):
         """Load the model into memory"""
-        pass
+        # Set CUDA environment variables for GPU support
+        os.environ["LD_LIBRARY_PATH"] = subprocess.check_output(
+            "python3 -c 'import os; import nvidia.cublas.lib; import nvidia.cudnn.lib; print(os.path.dirname(nvidia.cublas.lib.__file__) + \":\" + os.path.dirname(nvidia.cudnn.lib.__file__))'",
+            shell=True
+        ).decode().strip()
 
     def predict(
         self,
         audio_file: Path = Input(description="Audio file to transcribe"),
         language: str = Input(
             description="Language code (e.g., 'en', 'fr', 'de')",
-            default="en"
+            default=None
         ),
+        model: str = Input(
+            description="Whisper model to use",
+            default="large-v3-turbo",
+            choices=["tiny", "base", "small", "medium", "large-v1", "large-v2", "large-v3", "large-v3-turbo"]
+        ),
+        subtitle: bool = Input(
+            description="Generate subtitles (.srt, .vtt)",
+            default=False
+        ),
+        translate: bool = Input(
+            description="Translate to English",
+            default=False
+        ),
+        export_format: str = Input(
+            description="Export format",
+            default="txt",
+            choices=["all", "json", "txt", "rttm", "vtt", "webvtt", "srt"]
+        )
     ) -> str:
         """Run whisply on the input audio file"""
         
@@ -21,13 +44,19 @@ class Predictor(BasePredictor):
         if not os.path.exists(audio_file):
             raise ValueError(f"Audio file not found: {audio_file}")
             
-        # Construct the whisply command
-        cmd = [
-            "whisply",
-            "--model", "large-v3",
-            "--language", language,
-            str(audio_file)
-        ]
+        # Build command with options
+        cmd = ["whisply", "--device", "gpu", "--model", model]
+        
+        if language:
+            cmd.extend(["--language", language])
+        if subtitle:
+            cmd.append("--subtitle")
+        if translate:
+            cmd.append("--translate")
+        if export_format != "all":
+            cmd.extend(["--export", export_format])
+            
+        cmd.append(str(audio_file))
         
         # Run whisply using subprocess
         try:
