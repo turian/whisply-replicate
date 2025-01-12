@@ -111,13 +111,18 @@ class Predictor(BasePredictor):
             
             # Create zip file of the output directory
             zip_path = PathLib(temp_dir) / "whisply_output.zip"
+            # Use absolute paths to avoid relative path issues
+            output_path_abs = str(output_path.absolute())
+            zip_path_abs = str(zip_path.absolute())
+            
             shutil.make_archive(
-                str(zip_path.with_suffix('')),  # Remove .zip as make_archive adds it
+                zip_path_abs[:-4],  # Remove .zip as make_archive adds it
                 'zip',
-                output_path
+                output_path_abs
             )
             
-            return Path(str(zip_path))
+            # Return the absolute path
+            return Path(zip_path_abs)
             
         except subprocess.CalledProcessError as e:
             raise RuntimeError(f"Whisply failed: {e.stderr}")
