@@ -70,9 +70,8 @@ class Predictor(BasePredictor):
         if not os.path.exists(audio_file):
             raise ValueError(f"Audio file not found: {audio_file}")
             
-        # Create temporary directory for outputs under /src
-        output_dir = PathLib("/src") / tempfile.mktemp(prefix="whisply_", dir="")
-        output_dir.mkdir(parents=True, exist_ok=True)
+        # Create a temporary directory for outputs under /src
+        output_dir = PathLib(tempfile.mkdtemp(prefix="whisply_", dir="/src"))
         try:
             # Build command with options
             cmd = ["whisply", "--device", "gpu", "--model", model, "--output_dir", str(output_dir)]
