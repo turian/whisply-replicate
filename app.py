@@ -133,6 +133,9 @@ class Predictor(BasePredictor):
                     cmd.extend(["--num_speakers", str(num_speakers)])
                 if hf_token:
                     cmd.extend(["--hf_token", hf_token])
+                else:
+                    # Handle the case where hf_token is None
+                    print("Warning: 'annotate' is True but 'hf_token' is not provided.")
             if verbose:
                 cmd.append("--verbose")
             if post_correction:
@@ -143,15 +146,16 @@ class Predictor(BasePredictor):
             # Add this print statement for diagnostics
             print(f"Executing command: {' '.join(cmd)}")
 
-            # Run Whisply and capture output
+            # Run Whisply and capture output with timeout
             result = subprocess.run(
                 cmd,
                 capture_output=True,
                 text=True,
-                check=True
+                check=True,
+                timeout=300  # Timeout after 5 minutes
             )
             
-            # Add these print statements for diagnostics
+            # Print outputs for diagnostics
             print("Whisply STDOUT:")
             print(result.stdout)
             print("Whisply STDERR:")
@@ -189,8 +193,10 @@ class Predictor(BasePredictor):
                 
             return Path(final_path)
             
+        except subprocess.TimeoutExpired as e:
+            print("Whisply command timed out.")
+            raise RuntimeError(f"Whisply command timed out after {e.timeout} seconds")
         except subprocess.CalledProcessError as e:
-            # Print error details for diagnostics
             print("Whisply failed with the following error:")
             print(e.stderr)
             raise RuntimeError(f"Whisply failed: {e.stderr}")
