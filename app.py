@@ -71,10 +71,12 @@ class Predictor(BasePredictor):
             raise ValueError(f"Audio file not found: {audio_file}")
             
         # Create temporary directory for outputs
-        output_dir = tempfile.mkdtemp()
+        base_temp_dir = tempfile.mkdtemp()
+        output_dir = PathLib(base_temp_dir) / "src"
+        output_dir.mkdir(parents=True)
         try:
             # Build command with options
-            cmd = ["whisply", "--device", "gpu", "--model", model, "--output_dir", output_dir]
+            cmd = ["whisply", "--device", "gpu", "--model", model, "--output_dir", str(output_dir)]
             
             if language:
                 cmd.extend(["--lang", language])
@@ -130,4 +132,4 @@ class Predictor(BasePredictor):
             raise RuntimeError(f"Whisply failed: {e.stderr}")
         finally:
             # Clean up the temporary directory
-            shutil.rmtree(output_dir, ignore_errors=True)
+            shutil.rmtree(base_temp_dir, ignore_errors=True)
