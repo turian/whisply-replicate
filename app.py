@@ -94,8 +94,8 @@ class Predictor(BasePredictor):
             cmd.append("--verbose")
         if post_correction:
             cmd.extend(["--post_correction", str(post_correction)])
-        # Always export all formats
-        cmd.append(str(audio_file))
+        # Add input file with --input flag
+        cmd.extend(["--input", str(audio_file)])
         
         # Run whisply using subprocess
         try:
