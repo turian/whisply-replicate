@@ -5,6 +5,7 @@ build:
     - "ffmpeg"
   python_packages:
     - "whisply"
+    - "python-magic"
   run:
     # Create cache directory for models
     - mkdir -p /root/.cache/huggingface
