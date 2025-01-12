@@ -71,13 +71,10 @@ class Predictor(BasePredictor):
             raise ValueError(f"Audio file not found: {audio_file}")
             
         # Create temporary directory for outputs
-        with tempfile.TemporaryDirectory() as temp_dir:
-            # Create nested output structure
-            output_path = PathLib(temp_dir) / "output"
-            output_path.mkdir(parents=True, exist_ok=True)
-            
-            # Build command with options using absolute path
-            cmd = ["whisply", "--device", "gpu", "--model", model, "--output_dir", str(output_path.absolute())]
+        output_dir = tempfile.mkdtemp()
+        try:
+            # Build command with options
+            cmd = ["whisply", "--device", "gpu", "--model", model, "--output_dir", output_dir]
         
         if language:
             cmd.extend(["--lang", language])
@@ -110,19 +107,13 @@ class Predictor(BasePredictor):
             )
             
             # Create zip file of the output directory
-            zip_path = PathLib(temp_dir) / "whisply_output.zip"
-            # Use absolute paths and ensure they're strings
-            output_path_abs = str(output_path.absolute())
-            zip_base = str(zip_path.absolute())[:-4]  # Remove .zip as make_archive adds it
+            zip_path = os.path.join(output_dir, "whisply_output")
+            shutil.make_archive(zip_path, 'zip', output_dir)
             
-            shutil.make_archive(
-                base_name=zip_base,
-                format='zip',
-                root_dir=output_path_abs
-            )
-            
-            # Return the path object directly from the zip path
-            return Path(zip_base + '.zip')
+            return Path(zip_path + '.zip')
             
         except subprocess.CalledProcessError as e:
             raise RuntimeError(f"Whisply failed: {e.stderr}")
+        finally:
+            # Clean up the temporary directory
+            shutil.rmtree(output_dir, ignore_errors=True)
