@@ -1,3 +1,4 @@
+import os
 import subprocess
 from cog import BasePredictor, Input, Path
 from typing import List
