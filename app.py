@@ -28,9 +28,35 @@ class Predictor(BasePredictor):
             description="Generate subtitles (.srt, .vtt)",
             default=False
         ),
+        sub_length: int = Input(
+            description="Subtitle segment length in words",
+            default=5,
+            ge=1
+        ),
         translate: bool = Input(
             description="Translate to English",
             default=False
+        ),
+        annotate: bool = Input(
+            description="Enable speaker annotation (requires HF token)",
+            default=False
+        ),
+        num_speakers: int = Input(
+            description="Number of speakers to annotate (auto-detection if None)",
+            default=None,
+            ge=2
+        ),
+        hf_token: str = Input(
+            description="HuggingFace Access token for speaker annotation",
+            default=None
+        ),
+        verbose: bool = Input(
+            description="Print text chunks during transcription",
+            default=False
+        ),
+        post_correction: Path = Input(
+            description="Path to YAML file for post-correction",
+            default=None
         ),
         export_format: str = Input(
             description="Export format",
@@ -51,8 +77,19 @@ class Predictor(BasePredictor):
             cmd.extend(["--language", language])
         if subtitle:
             cmd.append("--subtitle")
+            cmd.extend(["--sub_length", str(sub_length)])
         if translate:
             cmd.append("--translate")
+        if annotate:
+            cmd.append("--annotate")
+            if num_speakers:
+                cmd.extend(["--num_speakers", str(num_speakers)])
+            if hf_token:
+                cmd.extend(["--hf_token", hf_token])
+        if verbose:
+            cmd.append("--verbose")
+        if post_correction:
+            cmd.extend(["--post_correction", str(post_correction)])
         if export_format != "all":
             cmd.extend(["--export", export_format])
             
