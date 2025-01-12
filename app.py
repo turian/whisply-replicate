@@ -13,21 +13,6 @@ class Predictor(BasePredictor):
         # Create persistent cache directory for HF models
         os.makedirs("/root/.cache/huggingface", exist_ok=True)
         
-        # Additions for diagnostics
-        try:
-            # Print Whisply version
-            whisply_version = subprocess.run(
-                ["whisply", "--version"],
-                capture_output=True,
-                text=True,
-                check=True
-            ).stdout.strip()
-            print(f"Whisply version: {whisply_version}")
-        except subprocess.CalledProcessError as e:
-            print("Failed to get Whisply version:")
-            print(e.stderr)
-            raise RuntimeError(f"Failed to get Whisply version: {e.stderr}")
-        
         # Print environment variables
         print(f"Environment PATH: {os.environ.get('PATH')}")
         
