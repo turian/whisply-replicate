@@ -1,5 +1,8 @@
 import os
 import subprocess
+import tempfile
+import shutil
+from pathlib import Path as PathLib
 from cog import BasePredictor, Input, Path
 from typing import List
 
@@ -59,20 +62,24 @@ class Predictor(BasePredictor):
             description="Path to YAML file for post-correction",
             default=None
         ),
-        export_format: str = Input(
-            description="Export format",
-            default="txt",
-            choices=["all", "json", "txt", "rttm", "vtt", "webvtt", "srt"]
+        output_dir: str = Input(
+            description="Name for the output directory in the zip file",
+            default="whisply_output"
         )
-    ) -> str:
+    ) -> Path:
         """Run whisply on the input audio file"""
         
         # Ensure the input file exists
         if not os.path.exists(audio_file):
             raise ValueError(f"Audio file not found: {audio_file}")
             
-        # Build command with options
-        cmd = ["whisply", "--device", "gpu", "--model", model]
+        # Create temporary directory for outputs
+        with tempfile.TemporaryDirectory() as temp_dir:
+            temp_path = PathLib(temp_dir) / output_dir
+            temp_path.mkdir()
+            
+            # Build command with options
+            cmd = ["whisply", "--device", "gpu", "--model", model, "--output_dir", str(temp_path)]
         
         if language:
             cmd.extend(["--language", language])
@@ -91,19 +98,31 @@ class Predictor(BasePredictor):
             cmd.append("--verbose")
         if post_correction:
             cmd.extend(["--post_correction", str(post_correction)])
-        if export_format != "all":
-            cmd.extend(["--export", export_format])
-            
+        # Always export all formats
         cmd.append(str(audio_file))
         
         # Run whisply using subprocess
         try:
+            # Run whisply and capture output
             result = subprocess.run(
                 cmd,
                 capture_output=True,
                 text=True,
                 check=True
             )
-            return result.stdout.strip()
+            
+            # Create zip file in a new temp dir that will persist
+            zip_temp_dir = tempfile.mkdtemp()
+            zip_path = PathLib(zip_temp_dir) / f"{output_dir}.zip"
+            
+            # Create zip archive
+            shutil.make_archive(
+                str(zip_path.with_suffix('')),  # Remove .zip as make_archive adds it
+                'zip',
+                temp_dir
+            )
+            
+            return Path(str(zip_path))
+            
         except subprocess.CalledProcessError as e:
             raise RuntimeError(f"Whisply failed: {e.stderr}")
