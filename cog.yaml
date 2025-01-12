@@ -5,7 +5,6 @@ build:
     - "ffmpeg"
   python_packages:
     - "whisply"
-    - "huggingface_hub"
   run:
     # Download all v3 Whisper models during build
     - python -c "from whisply.download import download_models; download_models(['large-v3', 'distil-large-v3', 'large-v3-turbo'])"
