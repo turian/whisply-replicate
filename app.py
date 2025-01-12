@@ -58,6 +58,10 @@ class Predictor(BasePredictor):
             description="Print text chunks during transcription",
             default=False
         ),
+        post_correction: Path = Input(
+            description="Path to YAML file for post-correction",
+            default=None
+        ),
         output_dir: str = Input(
             description="Name for the output directory in the zip file",
             default="whisply_output"
@@ -92,6 +96,8 @@ class Predictor(BasePredictor):
                 cmd.extend(["--hf_token", hf_token])
         if verbose:
             cmd.append("--verbose")
+        if post_correction:
+            cmd.extend(["--post_correction", str(post_correction)])
         # Always export all formats
         cmd.append(str(audio_file))
         
