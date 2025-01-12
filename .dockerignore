@@ -1,0 +1,56 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+*.egg
+.eggs/
+.installed.cfg
+.pytest_cache/
+.coverage
+.coverage.*
+.cache
+*.cover
+.hypothesis/
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pyre/
+.pytype/
+
+# Virtual environments
+.env
+.venv
+env/
+venv/
+ENV/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Logs and databases
+*.log
+*.sqlite3
+
+# Build and dist
+build/
+dist/
+downloads/
+eggs/
+wheels/
+*.egg-info/
+
+# Temp files
+*.tmp
+*.temp
+.DS_Store
+
+# Project specific
+.aider*
+.git/
+.gitignore
