@@ -5,15 +5,7 @@ build:
     - "ffmpeg"
   python_packages:
     - "whisply"
-    - "torch"
-    - "numpy"
-    - "tqdm"
-    - "transformers>=4.19.0"
-    - "ffmpeg-python"
-    - "faster-whisper"
-    - "insanely-fast-whisper"
     - "nvidia-cublas-cu12"
     - "nvidia-cudnn-cu12"
-    - "pyannote.audio"
 
 predict: "app.py:Predictor"
