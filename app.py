@@ -97,6 +97,16 @@ class Predictor(BasePredictor):
         else:
             print(f"Using audio file: {audio_file}")
 
+        # Determine the original file extension
+        original_ext = os.path.splitext(audio_file.name)[1]
+        if not original_ext:
+            raise ValueError("Audio file must have a file extension")
+        
+        # Copy to a temporary file with the correct extension
+        temp_audio_file = PathLib(tempfile.mktemp(suffix=original_ext, dir="/src"))
+        shutil.copy(str(audio_file), str(temp_audio_file))
+        print(f"Copied audio file to: {temp_audio_file}")
+
         # Create a temporary directory for outputs under /src
         output_dir = PathLib(tempfile.mkdtemp(prefix="whisply_", dir="/src"))
         print(f"Temporary output directory created at: {output_dir}")
@@ -126,7 +136,7 @@ class Predictor(BasePredictor):
             if post_correction:
                 cmd.extend(["--post_correction", str(post_correction)])
             # Add input file with --files flag
-            cmd.extend(["--files", str(audio_file)])
+            cmd.extend(["--files", str(temp_audio_file)])
 
             # Add this print statement for diagnostics
             print(f"Executing command: {' '.join(cmd)}")
@@ -176,7 +186,7 @@ class Predictor(BasePredictor):
             if not final_path.exists() or final_path.stat().st_size < 100:
                 raise RuntimeError("Failed to create valid zip file")
                 
-            return Path(final_path)
+            return Path(str(final_path))
             
         except subprocess.TimeoutExpired as e:
             print("Whisply command timed out.")
@@ -190,6 +200,9 @@ class Predictor(BasePredictor):
             traceback.print_exc()
             raise RuntimeError(f"Error processing output: {str(e)}")
         finally:
-            # Clean up the temporary directory
+            # Clean up the temporary audio file
+            if temp_audio_file.exists():
+                temp_audio_file.unlink()
+            # Clean up the temporary output directory
             if output_dir.exists():
                 shutil.rmtree(output_dir, ignore_errors=True)
