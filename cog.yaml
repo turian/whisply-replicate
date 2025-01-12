@@ -5,13 +5,12 @@ build:
     - "ffmpeg"
   python_packages:
     - "whisply"
-    - "scipy"
   run:
     # Create cache directory for models
     - mkdir -p /root/.cache/huggingface
     # Create test directory and generate dummy audio file
     - mkdir -p /src/test
-    - python3 -c "import numpy as np; from scipy.io import wavfile; sr=16000; t=np.linspace(0,1,sr); wavfile.write('/src/test/dummy.mp3', sr, np.sin(2*np.pi*440*t))"
+    - ffmpeg -f lavfi -i "sine=frequency=440:duration=1" -c:a libmp3lame /src/test/dummy.mp3
     # Cache models by running whisply
     - bash -c '/root/.pyenv/shims/whisply --model large-v3 --device gpu --lang en --files /src/test/dummy.mp3 2>&1 | tee /tmp/whisply-large-v3.log'
     - bash -c '/root/.pyenv/shims/whisply --model distil-large-v3 --device gpu --lang en --files /src/test/dummy.mp3 2>&1 | tee /tmp/whisply-distil-large-v3.log'
