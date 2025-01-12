@@ -13,6 +13,6 @@ build:
     - whisply --model distil-large-v3 --device gpu --files test/dummy.mp3
     - whisply --model large-v3-turbo --device gpu --files test/dummy.mp3
     # Clean up output files
-    - rm -rf output/
+    - rm -rf *.log transcriptions/
 
 predict: "app.py:Predictor"
