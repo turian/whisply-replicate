@@ -92,20 +92,22 @@ class Predictor(BasePredictor):
         print(f"  verbose: {verbose}")
         print(f"  post_correction: {post_correction}")
 
+        # Get the original input file path
+        input_path = Path(audio_file)
+        
         # Ensure the input file exists and is a valid audio file
-        if not os.path.exists(audio_file):
-            raise ValueError(f"Audio file not found: {audio_file}")
+        if not input_path.exists():
+            raise ValueError(f"Audio file not found: {input_path}")
             
         # Check file type using python-magic
         mime = magic.Magic(mime=True)
-        file_type = mime.from_file(str(audio_file))
+        file_type = mime.from_file(str(input_path))
         if not file_type.startswith('audio/'):
             raise ValueError(f"Invalid file type: {file_type}. Expected audio file.")
             
-        print(f"Using audio file: {audio_file}")
+        print(f"Using audio file: {input_path}")
         print(f"File type: {file_type}")
-        print(f"Absolute audio file path: {os.path.abspath(audio_file)}")
-        print(f"Does audio file exist? {os.path.exists(audio_file)}")
+        print(f"Absolute audio file path: {input_path.absolute()}")
 
         # Create a temporary directory for outputs under /src
         output_dir = PathLib(tempfile.mkdtemp(prefix="whisply_", dir="/src"))
