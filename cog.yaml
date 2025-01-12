@@ -9,9 +9,9 @@ build:
     # Create cache directory for models
     - mkdir -p /root/.cache/huggingface
     # Cache models by running whisply
-    - bash -c 'whisply --model large-v3 --device gpu --lang en --files test/dummy.mp3 2>&1 | tee whisply-large-v3.log'
-    - bash -c 'whisply --model distil-large-v3 --device gpu --lang en --files test/dummy.mp3 2>&1 | tee whisply-distil-large-v3.log'
-    - bash -c 'whisply --model large-v3-turbo --device gpu --lang en --files test/dummy.mp3 2>&1 | tee whisply-large-v3-turbo.log'
+    - bash -c '/root/.pyenv/shims/whisply --model large-v3 --device gpu --lang en --files test/dummy.mp3 2>&1 | tee /tmp/whisply-large-v3.log'
+    - bash -c '/root/.pyenv/shims/whisply --model distil-large-v3 --device gpu --lang en --files test/dummy.mp3 2>&1 | tee /tmp/whisply-distil-large-v3.log'
+    - bash -c '/root/.pyenv/shims/whisply --model large-v3-turbo --device gpu --lang en --files test/dummy.mp3 2>&1 | tee /tmp/whisply-large-v3-turbo.log'
     # Clean up output files
     - rm -rf *.log transcriptions/
 
