@@ -127,19 +127,8 @@ class Predictor(BasePredictor):
                 cmd.append("--verbose")
             if post_correction:
                 cmd.extend(["--post_correction", str(post_correction)])
-            # Get original file extension and ensure temp file has correct extension
-            orig_ext = PathLib(audio_file).suffix
-            if not orig_ext:
-                # Default to .wav if no extension present
-                orig_ext = '.wav'
-            
-            # Create a symlink with proper extension
-            linked_input = PathLib(str(audio_file) + orig_ext)
-            if not linked_input.exists():
-                os.symlink(audio_file, linked_input)
-            
-            # Add input file with proper extension to --files flag
-            cmd.extend(["--files", str(linked_input)])
+            # Add input file to --files flag
+            cmd.extend(["--files", str(audio_file)])
 
             # Add this print statement for diagnostics
             print(f"Executing command: {' '.join(cmd)}")
@@ -206,8 +195,3 @@ class Predictor(BasePredictor):
             # Clean up the temporary output directory
             if output_dir.exists():
                 shutil.rmtree(output_dir, ignore_errors=True)
-            
-            # Clean up the temporary symlink if it exists
-            linked_input = PathLib(str(audio_file) + orig_ext)
-            if linked_input.exists():
-                linked_input.unlink()
