@@ -1,0 +1,13 @@
+build:
+  gpu: true
+  python_version: "3.11"
+  system_packages:
+    - "ffmpeg"
+  python_packages:
+    - "torch"
+    - "numpy"
+    - "tqdm"
+    - "transformers>=4.19.0"
+    - "ffmpeg-python"
+
+predict: "app.py:Predictor"
