@@ -61,10 +61,6 @@ class Predictor(BasePredictor):
         post_correction: Path = Input(
             description="Path to YAML file for post-correction",
             default=None
-        ),
-        output_dir: str = Input(
-            description="Name for the output directory in the zip file",
-            default="whisply_output"
         )
     ) -> Path:
         """Run whisply on the input audio file"""
@@ -75,7 +71,7 @@ class Predictor(BasePredictor):
             
         # Create temporary directory for outputs
         with tempfile.TemporaryDirectory() as temp_dir:
-            temp_path = PathLib(temp_dir) / output_dir
+            temp_path = PathLib(temp_dir) / "whisply_output"
             temp_path.mkdir()
             
             # Build command with options
@@ -113,7 +109,7 @@ class Predictor(BasePredictor):
             
             # Create zip file in a new temp dir that will persist
             zip_temp_dir = tempfile.mkdtemp()
-            zip_path = PathLib(zip_temp_dir) / f"{output_dir}.zip"
+            zip_path = PathLib(zip_temp_dir) / "whisply_output.zip"
             
             # Create zip archive
             shutil.make_archive(
