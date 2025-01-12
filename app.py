@@ -95,9 +95,7 @@ class Predictor(BasePredictor):
                 cmd.extend(["--post_correction", str(post_correction)])
             # Add input file with --files flag
             cmd.extend(["--files", str(audio_file)])
-        
-        # Run whisply using subprocess
-        try:
+
             # Run whisply and capture output
             result = subprocess.run(
                 cmd,
