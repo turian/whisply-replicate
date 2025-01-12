@@ -9,7 +9,8 @@ from typing import List
 class Predictor(BasePredictor):
     def setup(self):
         """Load the model into memory"""
-        pass
+        # Create persistent cache directory for HF models
+        os.makedirs("/root/.cache/huggingface", exist_ok=True)
 
     def predict(
         self,
