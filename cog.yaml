@@ -8,7 +8,11 @@ build:
   run:
     # Create cache directory for models
     - mkdir -p /root/.cache/huggingface
-    # Download all v3 Whisper models during build
-    - python -c "from whisply.download import download_models; download_models(['large-v3', 'distil-large-v3', 'large-v3-turbo'])"
+    # Cache models by running whisply on a test file
+    - whisply --model large-v3 --device gpu test/dummy.mp3
+    - whisply --model distil-large-v3 --device gpu test/dummy.mp3
+    - whisply --model large-v3-turbo --device gpu test/dummy.mp3
+    # Clean up output files
+    - rm -rf output/
 
 predict: "app.py:Predictor"
