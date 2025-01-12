@@ -18,7 +18,12 @@ class Predictor(BasePredictor):
         model: str = Input(
             description="Whisper model to use",
             default="large-v3-turbo",
-            choices=["tiny", "base", "small", "medium", "large-v1", "large-v2", "large-v3", "large-v3-turbo"]
+            choices=[
+                "tiny", "tiny-en", "base", "base-en", "small", "small-en",
+                "distil-small-en", "medium", "medium-en", "distil-medium-en",
+                "large", "large-v1", "large-v2", "distil-large-v2",
+                "large-v3", "distil-large-v3", "large-v3-turbo"
+            ]
         ),
         subtitle: bool = Input(
             description="Generate subtitles (.srt, .vtt)",
