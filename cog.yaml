@@ -9,9 +9,9 @@ build:
     # Create cache directory for models
     - mkdir -p /root/.cache/huggingface
     # Cache models by running whisply on a test file
-    - whisply --model large-v3 --device gpu test/dummy.mp3
-    - whisply --model distil-large-v3 --device gpu test/dummy.mp3
-    - whisply --model large-v3-turbo --device gpu test/dummy.mp3
+    - whisply --model large-v3 --device gpu --files test/dummy.mp3
+    - whisply --model distil-large-v3 --device gpu --files test/dummy.mp3
+    - whisply --model large-v3-turbo --device gpu --files test/dummy.mp3
     # Clean up output files
     - rm -rf output/
 
