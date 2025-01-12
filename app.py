@@ -108,7 +108,8 @@ class Predictor(BasePredictor):
             zip_path = os.path.join(output_dir, "whisply_output")
             shutil.make_archive(zip_path, 'zip', output_dir)
             
-            return Path(zip_path + '.zip')
+            # Convert to string to avoid bytes/string conversion issues
+            return Path(str(zip_path) + '.zip')
             
         except subprocess.CalledProcessError as e:
             raise RuntimeError(f"Whisply failed: {e.stderr}")
