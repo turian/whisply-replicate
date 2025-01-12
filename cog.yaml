@@ -8,11 +8,13 @@ build:
   run:
     # Create cache directory for models
     - mkdir -p /root/.cache/huggingface
-    # Cache models by running whisply on a test file
+    # Generate a test audio file
+    - ffmpeg -f lavfi -i anullsrc=r=16000:cl=mono -t 1 -q:a 9 -acodec libmp3lame test/dummy.mp3
+    # Cache models by running whisply on the test file
     - whisply --model large-v3 --device gpu --files test/dummy.mp3
     - whisply --model distil-large-v3 --device gpu --files test/dummy.mp3
     - whisply --model large-v3-turbo --device gpu --files test/dummy.mp3
     # Clean up output files
-    - rm -rf output/
+    - rm -rf output/ test/dummy.mp3
 
 predict: "app.py:Predictor"
