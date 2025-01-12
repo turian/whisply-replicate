@@ -78,7 +78,7 @@ class Predictor(BasePredictor):
             cmd = ["whisply", "--device", "gpu", "--model", model, "--output_dir", str(temp_path)]
         
         if language:
-            cmd.extend(["--language", language])
+            cmd.extend(["--lang", language])
         if subtitle:
             cmd.append("--subtitle")
             cmd.extend(["--sub_length", str(sub_length)])
