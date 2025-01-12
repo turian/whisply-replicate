@@ -71,11 +71,12 @@ class Predictor(BasePredictor):
             
         # Create temporary directory for outputs
         with tempfile.TemporaryDirectory() as temp_dir:
-            temp_path = PathLib(temp_dir) / "whisply_output"
-            temp_path.mkdir()
+            # Create nested output structure
+            output_path = PathLib(temp_dir) / "output"
+            output_path.mkdir(parents=True, exist_ok=True)
             
-            # Build command with options
-            cmd = ["whisply", "--device", "gpu", "--model", model, "--output_dir", str(temp_path)]
+            # Build command with options using absolute path
+            cmd = ["whisply", "--device", "gpu", "--model", model, "--output_dir", str(output_path.absolute())]
         
         if language:
             cmd.extend(["--lang", language])
@@ -107,15 +108,12 @@ class Predictor(BasePredictor):
                 check=True
             )
             
-            # Create zip file in a new temp dir that will persist
-            zip_temp_dir = tempfile.mkdtemp()
-            zip_path = PathLib(zip_temp_dir) / "whisply_output.zip"
-            
-            # Create zip archive
+            # Create zip file of the output directory
+            zip_path = PathLib(temp_dir) / "whisply_output.zip"
             shutil.make_archive(
                 str(zip_path.with_suffix('')),  # Remove .zip as make_archive adds it
                 'zip',
-                temp_dir
+                output_path
             )
             
             return Path(str(zip_path))
