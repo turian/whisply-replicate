@@ -1,4 +1,3 @@
-import os
 import subprocess
 from cog import BasePredictor, Input, Path
 from typing import List
@@ -6,11 +5,7 @@ from typing import List
 class Predictor(BasePredictor):
     def setup(self):
         """Load the model into memory"""
-        # Set CUDA environment variables for GPU support
-        os.environ["LD_LIBRARY_PATH"] = subprocess.check_output(
-            "python3 -c 'import os; import nvidia.cublas.lib; import nvidia.cudnn.lib; print(os.path.dirname(nvidia.cublas.lib.__file__) + \":\" + os.path.dirname(nvidia.cudnn.lib.__file__))'",
-            shell=True
-        ).decode().strip()
+        pass
 
     def predict(
         self,

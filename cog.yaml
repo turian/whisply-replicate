@@ -5,7 +5,5 @@ build:
     - "ffmpeg"
   python_packages:
     - "whisply"
-    - "nvidia-cublas-cu12"
-    - "nvidia-cudnn-cu12"
 
 predict: "app.py:Predictor"
