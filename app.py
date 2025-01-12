@@ -99,13 +99,40 @@ class Predictor(BasePredictor):
 
         # Determine the original file extension
         original_ext = os.path.splitext(audio_file.name)[1]
+
+        # If the file lacks an extension, determine its MIME type
         if not original_ext:
-            raise ValueError("Audio file must have a file extension")
-        
-        # Copy to a temporary file with the correct extension
-        temp_audio_file = PathLib(tempfile.mktemp(suffix=original_ext, dir="/src"))
-        shutil.copy(str(audio_file), str(temp_audio_file))
-        print(f"Copied audio file to: {temp_audio_file}")
+            try:
+                # Use the 'file' command to get the MIME type
+                mime_type = subprocess.check_output(['file', '--mime-type', '-b', str(audio_file)]).decode().strip()
+                print(f"Detected MIME type: {mime_type}")
+                
+                # Map MIME type to appropriate extension
+                mime_extension_map = {
+                    'audio/x-wav': '.wav',
+                    'audio/wav': '.wav',
+                    'audio/mpeg': '.mp3',
+                    'audio/ogg': '.ogg',
+                    'audio/flac': '.flac',
+                    'audio/mp4': '.m4a',
+                    # Add other mappings as needed
+                }
+                original_ext = mime_extension_map.get(mime_type)
+                
+                if not original_ext:
+                    raise ValueError(f"Unsupported MIME type: {mime_type}")
+                else:
+                    print(f"Assuming extension '{original_ext}' for MIME type '{mime_type}'")
+            except subprocess.CalledProcessError as e:
+                print("Failed to determine MIME type.")
+                raise ValueError("Could not determine the MIME type of the audio file.") from e
+
+        # Create a symbolic link with the correct extension
+        temp_audio_file = PathLib("/src") / f"audio_file{original_ext}"
+        if temp_audio_file.exists() or temp_audio_file.is_symlink():
+            temp_audio_file.unlink()
+        os.symlink(str(audio_file), str(temp_audio_file))
+        print(f"Created symbolic link to audio file: {temp_audio_file}")
 
         # Create a temporary directory for outputs under /src
         output_dir = PathLib(tempfile.mkdtemp(prefix="whisply_", dir="/src"))
@@ -200,8 +227,8 @@ class Predictor(BasePredictor):
             traceback.print_exc()
             raise RuntimeError(f"Error processing output: {str(e)}")
         finally:
-            # Clean up the temporary audio file
-            if temp_audio_file.exists():
+            # Clean up the symbolic link
+            if temp_audio_file.exists() or temp_audio_file.is_symlink():
                 temp_audio_file.unlink()
             # Clean up the temporary output directory
             if output_dir.exists():
