@@ -75,11 +75,11 @@ class Predictor(BasePredictor):
         try:
             # Build command with options
             cmd = ["whisply", "--device", "gpu", "--model", model, "--output_dir", output_dir]
-        
-        if language:
-            cmd.extend(["--lang", language])
-        if subtitle:
-            cmd.append("--subtitle")
+            
+            if language:
+                cmd.extend(["--lang", language])
+            if subtitle:
+                cmd.append("--subtitle")
             cmd.extend(["--sub_length", str(sub_length)])
         if translate:
             cmd.append("--translate")
