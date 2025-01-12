@@ -6,9 +6,9 @@ build:
   python_packages:
     - "whisply"
   run:
-    # Download all v3 Whisper models during build
-    - python -c "from whisply.download import download_models; download_models(['large-v3', 'distil-large-v3', 'large-v3-turbo'])"
-    # Create cache directory for pyannote models
+    # Create cache directory for models
     - mkdir -p /root/.cache/huggingface
+    # Download all v3 Whisper models during build
+    - pip install --no-cache-dir whisply && python -c "import whisply.cli; whisply.cli.download_models(['large-v3', 'distil-large-v3', 'large-v3-turbo'])"
 
 predict: "app.py:Predictor"
