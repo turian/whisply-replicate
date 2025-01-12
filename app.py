@@ -81,20 +81,20 @@ class Predictor(BasePredictor):
             if subtitle:
                 cmd.append("--subtitle")
             cmd.extend(["--sub_length", str(sub_length)])
-        if translate:
-            cmd.append("--translate")
-        if annotate:
-            cmd.append("--annotate")
-            if num_speakers:
-                cmd.extend(["--num_speakers", str(num_speakers)])
-            if hf_token:
-                cmd.extend(["--hf_token", hf_token])
-        if verbose:
-            cmd.append("--verbose")
-        if post_correction:
-            cmd.extend(["--post_correction", str(post_correction)])
-        # Add input file with --files flag
-        cmd.extend(["--files", str(audio_file)])
+            if translate:
+                cmd.append("--translate")
+            if annotate:
+                cmd.append("--annotate")
+                if num_speakers:
+                    cmd.extend(["--num_speakers", str(num_speakers)])
+                if hf_token:
+                    cmd.extend(["--hf_token", hf_token])
+            if verbose:
+                cmd.append("--verbose")
+            if post_correction:
+                cmd.extend(["--post_correction", str(post_correction)])
+            # Add input file with --files flag
+            cmd.extend(["--files", str(audio_file)])
         
         # Run whisply using subprocess
         try:
