@@ -5,7 +5,7 @@ A Replicate.com service for audio transcription, translation, and speaker diariz
 ## Features
 
 - **Multiple Whisper Models**: Support for various Whisper models including:
-  - `large-v3` (default)
+  - `distil-large-v3` (default)
   - `distil-large-v3`
   - `large-v3-turbo`
   - And many more standard Whisper models
