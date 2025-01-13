@@ -161,8 +161,7 @@ class Predictor(BasePredictor):
                 cmd,
                 capture_output=True,
                 text=True,
-                check=True,
-                timeout=300  # Timeout after 5 minutes
+                check=True
             )
             
             # Print outputs for diagnostics
