@@ -92,10 +92,8 @@ class Predictor(BasePredictor):
         print(f"  verbose: {verbose}")
         print(f"  post_correction: {post_correction}")
 
-        # Get the original input file path
+        # Get the original input file path and validate
         input_path = Path(audio_file)
-        
-        # Ensure the input file exists and is a valid audio file
         if not input_path.exists():
             raise ValueError(f"Audio file not found: {input_path}")
             
@@ -105,11 +103,26 @@ class Predictor(BasePredictor):
         if not file_type.startswith('audio/'):
             raise ValueError(f"Invalid file type: {file_type}. Expected audio file.")
             
-        print(f"Using audio file: {input_path}")
-        print(f"File type: {file_type}")
-        print(f"Absolute audio file path: {input_path.absolute()}")
+        # Create temporary directories for processing
+        temp_audio_dir = PathLib(tempfile.mkdtemp(prefix="audio_", dir="/src"))
+        wav_path = temp_audio_dir / "input.wav"
+        
+        # Convert input to WAV using ffmpeg
+        try:
+            subprocess.run([
+                "ffmpeg", "-i", str(input_path),
+                "-ar", "16000",  # Set sample rate to 16kHz
+                "-ac", "1",      # Convert to mono
+                "-c:a", "pcm_s16le",  # Use 16-bit PCM encoding
+                str(wav_path)
+            ], check=True, capture_output=True, text=True)
+        except subprocess.CalledProcessError as e:
+            raise RuntimeError(f"Failed to convert audio to WAV: {e.stderr}")
+            
+        print(f"Converted audio file to: {wav_path}")
+        print(f"Original file type: {file_type}")
 
-        # Create a temporary directory for outputs under /src
+        # Create a temporary directory for Whisply outputs under /src
         output_dir = PathLib(tempfile.mkdtemp(prefix="whisply_", dir="/src"))
         print(f"Temporary output directory created at: {output_dir}")
 
@@ -138,7 +151,7 @@ class Predictor(BasePredictor):
             if post_correction:
                 cmd.extend(["--post_correction", str(post_correction)])
             # Add input file to --files flag
-            cmd.extend(["--files", str(audio_file)])
+            cmd.extend(["--files", str(wav_path)])
 
             # Add this print statement for diagnostics
             print(f"Executing command: {' '.join(cmd)}")
@@ -202,6 +215,8 @@ class Predictor(BasePredictor):
             traceback.print_exc()
             raise RuntimeError(f"Error processing output: {str(e)}")
         finally:
-            # Clean up the temporary output directory
+            # Clean up the temporary directories
             if output_dir.exists():
                 shutil.rmtree(output_dir, ignore_errors=True)
+            if temp_audio_dir.exists():
+                shutil.rmtree(temp_audio_dir, ignore_errors=True)
