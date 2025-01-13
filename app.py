@@ -33,7 +33,7 @@ class Predictor(BasePredictor):
         ),
         model: str = Input(
             description="Whisper model to use",
-            default="large-v3-turbo",
+            default="large-v3",
             choices=[
                 "tiny", "tiny-en", "base", "base-en", "small", "small-en",
                 "distil-small-en", "medium", "medium-en", "distil-medium-en",
